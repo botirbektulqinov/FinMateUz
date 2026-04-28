@@ -9,6 +9,7 @@ class BotSettings(BaseSettings):
     api_base_url: str = "http://api:8000/api/v1"
     bot_api_token: str = "local-bot-token"
     transcriber_provider: str = "mock"
+    telegram_webhook_url: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -16,11 +17,15 @@ class BotSettings(BaseSettings):
     def validate_production_settings(self) -> "BotSettings":
         if self.environment.lower() != "production":
             return self
-        if self.telegram_bot_token == "dev-token" or self.telegram_bot_token.startswith("replace-with") or len(self.telegram_bot_token) < 30:
+        if (
+            self.telegram_bot_token == "dev-token"
+            or self.telegram_bot_token.startswith(("replace-with", "CHANGE_ME"))
+            or len(self.telegram_bot_token) < 30
+        ):
             raise ValueError("TELEGRAM_BOT_TOKEN must be set in production")
         if (
             self.bot_api_token in {"local-bot-token", "local-bot-token-for-local-only"}
-            or self.bot_api_token.startswith("replace-with")
+            or self.bot_api_token.startswith(("replace-with", "CHANGE_ME"))
             or len(self.bot_api_token) < 24
         ):
             raise ValueError("BOT_API_TOKEN must be a strong production secret")

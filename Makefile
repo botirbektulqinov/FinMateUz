@@ -1,4 +1,4 @@
-.PHONY: up down prod-up prod-down logs api-test bot-test web-test web-build migrate checks
+.PHONY: up down prod-up prod-down prod-logs prod-ps prod-restart prod-deploy logs api-test bot-test web-test web-build migrate checks
 
 up:
 	docker compose up --build postgres redis api web
@@ -11,6 +11,18 @@ prod-up:
 
 prod-down:
 	docker compose -f docker-compose.prod.yml down
+
+prod-logs:
+	docker compose -f docker-compose.prod.yml logs -f
+
+prod-ps:
+	docker compose -f docker-compose.prod.yml ps
+
+prod-restart:
+	docker compose -f docker-compose.prod.yml restart
+
+prod-deploy:
+	bash scripts/deploy-production.sh
 
 logs:
 	docker compose logs -f api web

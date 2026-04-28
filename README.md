@@ -77,6 +77,10 @@ make up          # start local stack
 make down        # stop local stack
 make prod-up     # start production-style stack from docker-compose.prod.yml
 make prod-down   # stop production-style stack
+make prod-logs   # follow production stack logs
+make prod-ps     # show production stack containers
+make prod-restart
+make prod-deploy # run scripts/deploy-production.sh
 make migrate     # run Alembic migrations in API container
 make api-test    # backend tests
 make bot-test    # bot tests
@@ -146,7 +150,13 @@ The production server should keep real environment values in `/opt/finmateuz/.en
 
 See [SECURITY.md](SECURITY.md) and [docs/SECURITY.md](docs/SECURITY.md).
 
-## Deployment
+## Production Deployment
+
+Production URLs:
+
+- Dashboard: `https://app.finmates.app`
+- API: `https://api.finmates.app`
+- Root redirect: `https://finmates.app` -> `https://app.finmates.app`
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Minimum production steps:
 

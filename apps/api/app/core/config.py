@@ -28,9 +28,17 @@ class Settings(BaseSettings):
             "local-bot-token",
             "local-bot-token-for-local-only",
         }
-        if self.jwt_secret_key in weak_values or self.jwt_secret_key.startswith("replace-with") or len(self.jwt_secret_key) < 32:
+        if (
+            self.jwt_secret_key in weak_values
+            or self.jwt_secret_key.startswith(("replace-with", "CHANGE_ME"))
+            or len(self.jwt_secret_key) < 32
+        ):
             raise ValueError("JWT_SECRET_KEY must be a strong production secret")
-        if self.bot_api_token in weak_values or self.bot_api_token.startswith("replace-with") or len(self.bot_api_token) < 24:
+        if (
+            self.bot_api_token in weak_values
+            or self.bot_api_token.startswith(("replace-with", "CHANGE_ME"))
+            or len(self.bot_api_token) < 24
+        ):
             raise ValueError("BOT_API_TOKEN must be a strong production secret")
         return self
 
