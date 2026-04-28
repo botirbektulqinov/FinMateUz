@@ -160,7 +160,7 @@ Production URLs:
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Minimum production steps:
 
-1. Copy `.env.production.example` to `.env` on the server and replace every secret.
+1. Create `.env` on the server from `.env.example` or your private server template, then replace every secret and production URL.
 2. Set `ENVIRONMENT=production`.
 3. Point `DATABASE_URL`, `REDIS_URL`, `CORS_ORIGINS`, `API_BASE_URL`, and `NEXT_PUBLIC_API_URL` to production resources/domains.
 4. Run `docker compose -f docker-compose.prod.yml up --build -d`.

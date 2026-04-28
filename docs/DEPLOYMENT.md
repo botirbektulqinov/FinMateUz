@@ -2,22 +2,24 @@
 
 Target:
 
-- Root domain: `https://finmates.app` redirects to `https://app.finmates.app`
+- Root domain redirects to the dashboard domain.
 - Dashboard: `https://app.finmates.app`
 - API: `https://api.finmates.app`
-- Server: DigitalOcean Ubuntu VPS, public IP `134.122.92.113`
+- Server: Ubuntu VPS
 - Reverse proxy: Caddy installed directly on the server
 - Runtime: Docker Compose production stack
 
+This repository intentionally does not store the server IP, real secrets, or a server Caddyfile. Keep those values on the server or in the DNS/control-panel configuration.
+
 ## DNS
 
-Create these records at name.com:
+In your DNS provider, point the required host records to the production server:
 
 ```text
-A @   -> 134.122.92.113
-A www -> 134.122.92.113
-A app -> 134.122.92.113
-A api -> 134.122.92.113
+A @   -> <server-ip>
+A www -> <server-ip>
+A app -> <server-ip>
+A api -> <server-ip>
 ```
 
 Wait for DNS propagation before expecting Caddy certificates to issue.
@@ -34,11 +36,9 @@ sudo ufw enable
 sudo ufw status
 ```
 
-Do not expose ports `3000`, `8000`, `5432`, or `6379` publicly. Docker Compose binds web/API to `127.0.0.1`; PostgreSQL and Redis have no public port mapping.
+Do not expose ports `3000`, `8000`, `5432`, or `6379` publicly. Production Docker Compose binds web/API to `127.0.0.1`; PostgreSQL and Redis have no public port mapping.
 
 ## Ubuntu Setup
-
-Update the server and install basic tools:
 
 ```bash
 sudo apt update
@@ -63,34 +63,18 @@ Log out and back in after changing Docker group membership.
 
 ## Caddy
 
-Install Caddy using the official Ubuntu package instructions. Then copy the example config:
+Caddy is managed directly on the server, outside this repository. The server Caddyfile should:
+
+- redirect the root domain and `www` host to `https://app.finmates.app`
+- reverse proxy `app.finmates.app` to `127.0.0.1:3000`
+- reverse proxy `api.finmates.app` to `127.0.0.1:8000`
+
+Validate and reload after editing the server Caddyfile:
 
 ```bash
-sudo mkdir -p /etc/caddy
-sudo cp /opt/finmateuz/infra/caddy/Caddyfile.example /etc/caddy/Caddyfile
 sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy
 sudo systemctl status caddy
-```
-
-Caddyfile:
-
-```caddyfile
-finmates.app {
-    redir https://app.finmates.app{uri} permanent
-}
-
-www.finmates.app {
-    redir https://app.finmates.app{uri} permanent
-}
-
-app.finmates.app {
-    reverse_proxy 127.0.0.1:3000
-}
-
-api.finmates.app {
-    reverse_proxy 127.0.0.1:8000
-}
 ```
 
 Caddy automatically issues and renews HTTPS certificates.
@@ -99,34 +83,43 @@ Caddy automatically issues and renews HTTPS certificates.
 
 ```bash
 cd /opt
-sudo git clone https://github.com/botirbektulqinov/FinMateUz.git finmateuz
-sudo chown -R "$USER":"$USER" /opt/finmateuz
+git clone https://github.com/botirbektulqinov/FinMateUz.git finmateuz
 cd /opt/finmateuz
+```
+
+If cloned with `sudo`, fix ownership:
+
+```bash
+sudo chown -R "$USER":"$USER" /opt/finmateuz
 ```
 
 ## Environment
 
+Create `.env` on the server and fill production values manually:
+
 ```bash
-cp .env.production.example .env
+cp .env.example .env
 nano .env
 ```
 
-Fill these manually with real production values:
+Required production values:
 
-- `POSTGRES_PASSWORD`
-- `DATABASE_URL`
-- `JWT_SECRET_KEY`
-- `TELEGRAM_BOT_TOKEN`
-- `BOT_API_TOKEN`
-
-Production Docker values must use service hosts:
-
-- `POSTGRES_HOST=postgres`
-- `DATABASE_URL=postgresql+psycopg://finmate:<password>@postgres:5432/finmate`
-- `REDIS_URL=redis://redis:6379/0`
-- `NEXT_PUBLIC_API_URL=https://api.finmates.app/api/v1`
-- `API_BASE_URL=https://api.finmates.app/api/v1`
-- `CORS_ORIGINS=["https://app.finmates.app","https://finmates.app","https://www.finmates.app"]`
+```text
+ENVIRONMENT=production
+POSTGRES_DB=finmate
+POSTGRES_USER=finmate
+POSTGRES_PASSWORD=<strong-postgres-password>
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+DATABASE_URL=postgresql+psycopg://finmate:<strong-postgres-password>@postgres:5432/finmate
+REDIS_URL=redis://redis:6379/0
+JWT_SECRET_KEY=<long-random-secret>
+CORS_ORIGINS=["https://app.finmates.app","https://finmates.app","https://www.finmates.app"]
+TELEGRAM_BOT_TOKEN=<botfather-token>
+API_BASE_URL=https://api.finmates.app/api/v1
+BOT_API_TOKEN=<strong-internal-token>
+NEXT_PUBLIC_API_URL=https://api.finmates.app/api/v1
+```
 
 Never commit `.env`.
 
@@ -163,7 +156,7 @@ Expected:
 - API local health returns `{"status":"ok"}`.
 - `https://api.finmates.app/health` returns HTTP 200.
 - `https://app.finmates.app` returns dashboard HTML.
-- root and `www` return redirects to `https://app.finmates.app`.
+- root and `www` redirect to the dashboard domain.
 
 ## Deploy Updates
 
@@ -192,7 +185,7 @@ docker compose -f docker-compose.prod.yml exec -T postgres \
   pg_dump -U finmate -d finmate > "finmate-$(date +%F).sql"
 ```
 
-For real production usage, also enable DigitalOcean volume/server snapshots or move PostgreSQL to a managed database with automated backups and restore testing.
+For real production usage, also enable provider snapshots or move PostgreSQL to a managed database with automated backups and restore testing.
 
 ## Troubleshooting
 
@@ -230,4 +223,4 @@ Common causes:
 - `REDIS_URL` uses `localhost` instead of `redis`.
 - API failed startup because production secrets still use placeholders.
 - Web was built without `NEXT_PUBLIC_API_URL=https://api.finmates.app/api/v1`.
-- Caddy loaded an old config or DNS does not point to `134.122.92.113`.
+- Caddy loaded an old config or DNS does not point to the current server.

@@ -16,7 +16,7 @@ if [[ ! -f "${COMPOSE_FILE}" ]]; then
 fi
 
 if [[ ! -f ".env" ]]; then
-  echo ".env is missing. Create it from .env.production.example and fill production secrets first." >&2
+  echo ".env is missing. Create it from .env.example or your server template, then fill production secrets first." >&2
   exit 1
 fi
 
