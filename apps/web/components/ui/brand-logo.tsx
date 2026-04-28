@@ -16,7 +16,7 @@ export function BrandLogo({ size = "md", showWordmark = false, className = "" }:
   return (
     <div className={`flex items-center gap-3 ${className}`} aria-label="FinMate UZ">
       <span className={`${sizes[size]} relative shrink-0 overflow-hidden rounded-full shadow-sm ring-1 ring-line`}>
-        <Image src="/brand-icon.png" alt="" width={48} height={48} unoptimized className="h-full w-full object-cover" priority={size === "lg"} />
+        <Image src="/icon.png" alt="" width={48} height={48} unoptimized className="h-full w-full object-cover" priority={size === "lg"} />
       </span>
       {showWordmark ? (
         <span className="text-xl font-bold tracking-normal text-ink">
