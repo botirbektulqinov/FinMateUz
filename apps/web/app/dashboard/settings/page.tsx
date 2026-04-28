@@ -1,12 +1,13 @@
 "use client";
 
-import { Bot, Copy, LogOut, ShieldCheck, UserRound } from "lucide-react";
+import { Bot, Copy, LogOut, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field, TextInput } from "@/components/ui/input";
 import { apiClient, authStorage } from "@/lib/api-client";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader title="Current user" />
           <div className="space-y-3 p-5 text-sm">
-            <div className="flex items-center gap-3 text-ink"><UserRound className="h-5 w-5" />{user.data?.full_name ?? "User"}</div>
+            <div className="flex items-center gap-3 text-ink"><BrandLogo size="sm" />{user.data?.full_name ?? "User"}</div>
             <div className="text-muted">{user.data?.email ?? "No email loaded"}</div>
             <Button type="button" tone="danger" onClick={logout}>
               <LogOut className="h-4 w-4" />

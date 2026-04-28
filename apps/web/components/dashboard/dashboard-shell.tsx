@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Building2, FolderKanban, LayoutDashboard, LogOut, Menu, ReceiptText, Settings, UserRound } from "lucide-react";
+import { BarChart3, Building2, FolderKanban, LayoutDashboard, LogOut, Menu, ReceiptText, Settings } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, ApiError, authStorage } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 const nav = [
   { href: "/dashboard/overview", label: "Overview", icon: LayoutDashboard },
@@ -75,7 +76,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-canvas">
       <aside className={`fixed inset-y-0 left-0 z-30 w-72 border-r border-line bg-panel px-4 py-5 transition-transform lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <Link href="/dashboard/overview" className="flex items-center gap-3 rounded-md px-2 py-2">
-          <div className="grid h-10 w-10 place-items-center rounded-md bg-ink text-sm font-bold text-white">FM</div>
+          <BrandLogo size="md" />
           <div>
             <div className="font-semibold text-ink">FinMate UZ</div>
             <div className="text-xs text-muted">Cash flow nazorati</div>
@@ -126,7 +127,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 <option>This quarter</option>
               </select>
               <div className="hidden items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm text-ink sm:flex">
-                <UserRound className="h-4 w-4 text-muted" />
+                <BrandLogo size="sm" />
                 <span>{user.data?.full_name ?? "User"}</span>
               </div>
               <Button type="button" tone="secondary" className="hidden gap-2 sm:inline-flex" onClick={logout}>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field, SelectInput, TextInput } from "@/components/ui/input";
 import { apiClient, authStorage } from "@/lib/api-client";
 import type { TokenPair } from "@/lib/types";
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 const businessTypes = ["Store", "Education center", "Service business", "Clinic", "Agency", "Other"];
 
@@ -101,7 +102,7 @@ async function finishAuth(tokens: TokenPair) {
 function AuthPanel({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
     <section className="w-full max-w-md rounded-md border border-line bg-panel p-6 shadow-soft">
-      <div className="grid h-11 w-11 place-items-center rounded-md bg-ink font-bold text-white">FM</div>
+      <BrandLogo size="lg" showWordmark />
       <h1 className="mt-5 text-2xl font-semibold text-ink">{title}</h1>
       <p className="mt-2 text-sm text-muted">{description}</p>
       <div className="mt-6">{children}</div>
